@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BFHL API Frontend</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .result {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BFHL API Interaction</h1>
+
+    <!-- Form for GET request -->
+    <button id="getButton">Get Operation Code</button>
+    <div class="result" id="getResult"></div>
+
+    <!-- Form for POST request -->
+    <h2>Post Data</h2>
+    <label for="data">Input Data (comma-separated)</label>
+    <input type="text" id="data" placeholder="e.g., M,1,334,4,B,Z,a,7" />
+
+    <label for="user_fullname">Full Name</label>
+    <input type="text" id="user_fullname" placeholder="e.g., John Doe" />
+
+    <label for="dob">Date of Birth (ddmmyyyy)</label>
+    <input type="text" id="dob" placeholder="e.g., 17091999" />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="e.g., john@xyz.com" />
+
+    <label for="roll_number">Roll Number</label>
+    <input type="text" id="roll_number" placeholder="e.g., ABCD123" />
+
+    <label for="file">Base64 Encoded File String</label>
+    <textarea id="file" placeholder="Paste base64 string here"></textarea>
+
+    <button id="postButton">Submit Data</button>
+    <div class="result" id="postResult"></div>
+  </div>
+
+  <script>
+    const apiUrl = "https://your-vercel-url.vercel.app/bfhl"; // Replace with your deployed API URL
+
+    // Handle GET request
+    document.getElementById("getButton").addEventListener("click", async () => {
+      try {
+        const response = await fetch(apiUrl, { method: "GET" });
+        const result = await response.json();
+        document.getElementById("getResult").textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("getResult").textContent = `Error: ${error.message}`;
+      }
+    });
+
+    // Handle POST request
+    document.getElementById("postButton").addEventListener("click", async () => {
+      const data = document.getElementById("data").value.split(",");
+      const user_fullname = document.getElementById("user_fullname").value;
+      const dob = document.getElementById("dob").value;
+      const email = document.getElementById("email").value;
+      const roll_number = document.getElementById("roll_number").value;
+      const file_b64 = document.getElementById("file").value;
+
+      const formData = new URLSearchParams();
+      formData.append("data", JSON.stringify(data));
+      formData.append("user_fullname", user_fullname);
+      formData.append("dob", dob);
+      formData.append("email", email);
+      formData.append("roll_number", roll_number);
+      if (file_b64) formData.append("file_b64", file_b64);
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData,
+        });
+        const result = await response.json();
+        document.getElementById("postResult").textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        document.getElementById("postResult").textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
